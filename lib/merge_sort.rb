@@ -5,11 +5,9 @@ module MergeSort
   def merge(left, right, arr = [])
     (left.size + right.size).times do
       if left.empty?
-        arr << right
-        return arr
+        arr << right.shift
       elsif right.empty?
-        arr << left
-        return arr
+        arr << left.shift
       else
         if left[0] > right[0]
           arr.push(right[0])
