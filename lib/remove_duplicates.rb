@@ -15,7 +15,6 @@ module RemoveDuplicates
         end
         previous = now
       end
-      puts 'jo'
     end
     array
   end
