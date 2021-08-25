@@ -38,7 +38,17 @@ class Node
     end
   end
 
-  
+  def inorder_loop(root = self)
+    return if root.nil?
+
+    inorder_loop(root.left)
+    puts root.val
+    inorder_loop(root.right)
+  end
+
+  def delete()
+
+  end
 end
 
 # the BST class
@@ -63,6 +73,11 @@ class Tree
     mid = array.length/2
     Node.new(array[mid], create_tree(array[0...mid]), create_tree(array[mid+1..-1]))
   end
+
+  def inorder
+    puts "say hi"
+    @root.inorder_loop
+  end
 end
 
 arra = [3, 2, 5, 2, 3, 43, 7, 6, 23, 6, 98, 111, 77]
@@ -78,3 +93,5 @@ p tree.root.right.left.left
 p tree.root.left
 p 'ji'
 p too.root.right.right
+
+tree.inorder
