@@ -2,6 +2,7 @@
 
 require_relative 'merge_sort'
 require_relative 'remove_duplicates'
+require 'pry-byebug'
 
 # the node class
 class Node
@@ -38,16 +39,85 @@ class Node
     end
   end
 
-  def inorder_loop(root = self)
-    return if root.nil?
+  def inorder_loop(root = self, ordered = [])
+    return ordered if root.nil?
+    return ordered if root.val.nil?
 
-    inorder_loop(root.left)
-    puts root.val
-    inorder_loop(root.right)
+    inorder_loop(root.left, ordered)
+    ordered.push(root.val)
+    inorder_loop(root.right, ordered)
   end
 
-  def delete()
+  def postorder_loop(root = self, ordered = [])
+    return ordered if root.nil?
+    return ordered if root.val.nil?
 
+    postorder_loop(root.left, ordered)
+    postorder_loop(root.right, ordered)
+    ordered.push(root.val)
+  end
+
+  def preorder_loop(root = self, ordered = [])
+    return ordered if root.nil?
+    return ordered if root.val.nil?
+
+    ordered.push(root.val)
+    preorder_loop(root.left, ordered)
+    preorder_loop(root.right, ordered)
+  end
+
+  def delete(value)
+    if value == self.val
+      if self.left.val.nil? && self.right.val.nil?
+        self.val = nil 
+        return
+      elsif self.right.nil?
+        self.left = self.left.left
+        self.right = self.left.right
+        self.val = self.left.val
+        return
+      elsif self.left.nil?
+        self.right = self.right.right
+        self.left = self.right.left
+        self.val = self.right.val
+        return
+      elsif self.right.left.nil?
+        self.val = self.right.val
+        self.right =self.right.right
+      else 
+        self.val = find_successor(self.right)
+      end
+
+    elsif value > self.val
+      return if self.right.nil?
+
+      delete(value) if value == self.val
+      self.right.delete(value)
+
+    else
+      return if self.right.nil?
+
+      delete(value) if value == self.val
+      self.left.delte(value)
+    end
+  end
+
+  def find_successor(input)
+    return input if input.left.nil?
+
+    find_successor(input.left)
+  end
+
+  def find_node(value)
+    return value if self.val == value
+
+    return nil if self.val.nil?
+
+    if value > self.val
+      find_node(self.right)
+    else
+      find_node(self.left)
+    end
   end
 end
 
@@ -63,7 +133,6 @@ class Tree
   end
 
   def build_tree(array)
-    p remove_duplicates(msort(array))
     create_tree(remove_duplicates(msort(array)))
   end
 
@@ -75,8 +144,45 @@ class Tree
   end
 
   def inorder
-    puts "say hi"
     @root.inorder_loop
+  end
+
+  def postorder
+    @root.postorder_loop
+  end
+
+  def preorder
+    @root.preorder_loop
+  end
+
+  def find(value)
+    find_node(value)
+  end
+
+  def level_order
+    return if @root.nil?
+
+    order = []
+    queue = []
+    queue.push(@root)
+
+    while !queue.empty?
+      current = queue[0]
+      order.push(current.val)
+      queue.shift
+
+      unless current.left.nil?
+        unless current.left.val.nil?
+          queue.push(current.left)
+        end
+      end
+      unless current.right.nil?
+        unless current.right.val.nil?
+          queue.push(current.right)
+        end
+      end
+    end
+    order
   end
 end
 
@@ -87,11 +193,9 @@ tree = Tree.new(arra)
 too = Tree.new(parra)
 
 too.root.insert(8)
-p tree.root
-p tree.root.right
-p tree.root.right.left.left
-p tree.root.left
-p 'ji'
-p too.root.right.right
-
 tree.inorder
+p tree.level_order
+
+p tree.inorder
+p tree.postorder
+p tree.preorder
