@@ -137,6 +137,7 @@ class Tree
   end
 
   def create_tree(array)
+    return nil if array.empty?
     return Node.new(array[0]) unless array.length > 1
 
     mid = array.length/2
@@ -184,6 +185,35 @@ class Tree
     end
     order
   end
+
+  def height(node, level = 0)
+    return level if node.left.nil? && node.right.nil?
+    return level + 1 if node.left.nil? || node.right.nil?
+
+    level += 1
+    left = height(node.left, level)
+    right = height(node.right, level)
+    left > right ? left : right
+  end
+
+  def depth(target, level = 0, node = @root)
+    return nil if node.nil?
+    return level if node.val == target
+
+    if target > node.val
+      depth(target, level + 1, node.right)
+    elsif target < node.val
+      depth(target, level + 1, node.left)
+    else
+      return nil
+    end
+  end
+
+  def pretty_print(node = @root, prefix = '', is_left = true)
+    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
+    puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.val}"
+    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
+  end
 end
 
 arra = [3, 2, 5, 2, 3, 43, 7, 6, 23, 6, 98, 111, 77]
@@ -199,3 +229,8 @@ p tree.level_order
 p tree.inorder
 p tree.postorder
 p tree.preorder
+
+p tree.pretty_print
+
+p tree.height(tree.root.right)
+p tree.depth(44)
