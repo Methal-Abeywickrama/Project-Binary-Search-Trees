@@ -23,18 +23,18 @@ class Node
     @val
   end
 
-  def insert(value)
+  def insert_at(value)
     if value > self.val
       if self.right.nil?
         self.right = Node.new(value)
       else
-        self.right.insert(value)
+        self.right.insert_at(value)
       end
     elsif value < self.val
       if self.left.nil?
         self.left = Node.new(value)
       else
-        self.left.insert(value)
+        self.left.insert_at(value)
       end
     end
   end
@@ -69,7 +69,7 @@ class Node
   def delete(value)
     if value == self.val
       if self.left.val.nil? && self.right.val.nil?
-        self.val = nil 
+        self.val = nil
         return
       elsif self.right.nil?
         self.left = self.left.left
@@ -84,7 +84,7 @@ class Node
       elsif self.right.left.nil?
         self.val = self.right.val
         self.right =self.right.right
-      else 
+      else
         self.val = find_successor(self.right)
       end
 
@@ -130,6 +130,10 @@ class Tree
   def initialize(array)
     @source = array
     @root = build_tree(@source)
+  end
+
+  def insert(val)
+    @root.insert_at(val)
   end
 
   def build_tree(array)
@@ -187,12 +191,13 @@ class Tree
   end
 
   def height(node, level = 0)
+    return 0 if node.nil?
     return level if node.left.nil? && node.right.nil?
     return level + 1 if node.left.nil? || node.right.nil?
 
-    level += 1
-    left = height(node.left, level)
-    right = height(node.right, level)
+    # level += 1
+    left = height(node.left, level + 1)
+    right = height(node.right, level + 1)
     left > right ? left : right
   end
 
@@ -209,6 +214,23 @@ class Tree
     end
   end
 
+  def balanced?(node = @root)
+    return true if node.nil?
+
+    left_height = height(node.left)
+    right_height = height(node.right)
+    difference = (right_height - left_height)
+    binding.pry
+    return true if difference.abs <= 1 && balanced?(node.left) && balanced?(node.right)
+
+    false
+  end
+
+  def rebalance
+    data = tree.inorder
+    @root = self.build_tree(data)
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.val}"
@@ -216,21 +238,23 @@ class Tree
   end
 end
 
-arra = [3, 2, 5, 2, 3, 43, 7, 6, 23, 6, 98, 111, 77]
-parra = [6, 2, 4]
+arra = (Array.new(15) { rand(1..100) })
 
 tree = Tree.new(arra)
-too = Tree.new(parra)
 
-too.root.insert(8)
-tree.inorder
-p tree.level_order
+p tree.balanced?
+tree.pretty_print
 
 p tree.inorder
-p tree.postorder
 p tree.preorder
+p tree.postorder
 
-p tree.pretty_print
-
-p tree.height(tree.root.right)
-p tree.depth(44)
+tree.insert(111)
+tree.insert(112)
+tree.insert(113)
+tree.insert(114)
+tree.insert(115)
+tree.insert(116)
+tree.pretty_print
+binding.pry
+p tree.balanced?
